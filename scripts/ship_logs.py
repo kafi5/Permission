@@ -16,17 +16,21 @@ H = {"x-runner-secret": os.environ.get("RUNNER_SECRET", ""), "content-type": "ap
 ANSI = re.compile(r"\x1b\[[0-9;]*[A-Za-z]")
 
 buf, lock, first, done = [], threading.Lock(), [True], threading.Event()
+cnt = {"sent": 0, "recv": 0}
 
 
 def flush():
     with lock:
         lines = buf[:]
         buf.clear()
+        sent, recv = cnt["sent"], cnt["recv"]
+        cnt["sent"] = cnt["recv"] = 0
     if not SITE or (not lines and not first[0]):
         return
     try:
         r = requests.post(f"{SITE}/.netlify/functions/logs", headers=H, timeout=10,
-                          json={"name": name, "token": tok, "lines": lines, "reset": first[0]})
+                          json={"name": name, "token": tok, "lines": lines, "reset": first[0],
+                                "sent": sent, "recv": recv})
         if r.ok:
             first[0] = False
             return
@@ -34,6 +38,8 @@ def flush():
         pass
     with lock:                       # keep the lines for the next try
         buf[:0] = lines
+        cnt["sent"] += sent
+        cnt["recv"] += recv
 
 
 def pump():
@@ -48,5 +54,9 @@ for line in sys.stdin:
     print(f"[{name}] {line}", flush=True)
     with lock:
         buf.append(line)
+        if "[Request]:" in line:
+            cnt["sent"] += 1
+        elif "[Response]:" in line:
+            cnt["recv"] += 1
 done.set()
 flush()

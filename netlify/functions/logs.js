@@ -21,7 +21,9 @@ exports.handler = wrap(async (event) => {
     const key = `${name}__t${tok}`;
     const cur = b.reset ? null : await s.get(key, { type: "json" });
     const lines = ((cur && cur.lines) || []).concat((b.lines || []).map((l) => String(l).slice(0, MAX_LINE)));
-    await s.setJSON(key, { lines: lines.slice(-MAX_STORED), at: Date.now() });
+    const sent = ((cur && cur.sent) || 0) + (parseInt(b.sent, 10) || 0);
+    const recv = ((cur && cur.recv) || 0) + (parseInt(b.recv, 10) || 0);
+    await s.setJSON(key, { lines: lines.slice(-MAX_STORED), at: Date.now(), sent, recv });
     return json(200, { ok: true });
   }
 
@@ -50,7 +52,7 @@ exports.handler = wrap(async (event) => {
     const tokens = {};
     for (const k of keys.filter((k) => k.startsWith(name + "__t"))) {
       const v = await s.get(k, { type: "json" });
-      if (v) tokens[k.split("__t")[1]] = { lines: v.lines.slice(-MAX_SENT), at: v.at };
+      if (v) tokens[k.split("__t")[1]] = { lines: v.lines.slice(-MAX_SENT), at: v.at, sent: v.sent || 0, recv: v.recv || 0 };
     }
     return json(200, { tokens });
   }

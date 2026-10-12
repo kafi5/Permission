@@ -28,12 +28,35 @@
   #msg{min-height:20px;font-size:13px;color:var(--mut)}
   pre.log{margin:6px 0 0;padding:10px;background:#0a0d14;border:1px solid var(--line);border-radius:10px;font:12px/1.45 ui-monospace,Menlo,monospace;max-height:220px;overflow:auto;white-space:pre-wrap;word-break:break-all}
   .lh{margin-top:12px;font-size:13px;color:var(--mut);display:flex;justify-content:space-between}
+  .stat{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .stat>div{background:#0e121b;border:1px solid var(--line);border-radius:12px;padding:12px}
+  .stat .k{font-size:11px;color:var(--mut);text-transform:uppercase;letter-spacing:.06em}
+  .stat .v{font:600 22px/1.2 ui-monospace,Menlo,monospace;margin-top:4px}
+  .stat .v.o{color:var(--ac)}
+  .pill{display:inline-block;font-size:11px;padding:3px 9px;border-radius:99px;background:#232a3b;color:var(--mut)}
+  .pill.on{background:#143323;color:var(--ok)}
+  .banner{margin-top:10px;padding:12px;border-radius:10px;background:#0f2a1c;border:1px solid #1f6b45;color:var(--ok);font-weight:600}
+  .l-ok{color:#3ecf8e}.l-warn{color:#ffb454}.l-err{color:#ff8a8a}
 </style>
 </head>
 <body>
 <div class="wrap">
   <h1>RHK Tech <span>Premium Permission</span></h1>
   <div class="sub">Login (Gmail code / QR) &rarr; 4 tokens &rarr; auto apply at 9:55 PM (BD)</div>
+
+  <div class="card">
+    <div class="row" style="justify-content:space-between;align-items:center;margin-bottom:10px">
+      <h2 style="margin:0">Beijing time (UTC+8)</h2><span id="pill" class="pill">STANDBY</span>
+    </div>
+    <div class="stat">
+      <div><div class="k">Beijing now</div><div class="v" id="bjtime">--:--:--.---</div></div>
+      <div><div class="k">Next quota window 00:00 CST</div><div class="v o" id="cd">--:--:--.--</div></div>
+    </div>
+    <div class="row" style="justify-content:space-between;align-items:center;margin-top:10px">
+      <span class="mut">00:00 CST = 10:00 PM Bangladesh &middot; <span id="syncinfo">device clock</span></span>
+      <button class="g s" onclick="syncClock()">Sync clock</button>
+    </div>
+  </div>
 
   <div class="card">
     <h2>Admin</h2>
@@ -79,6 +102,11 @@
       <button class="g s" onclick="loadLogs()">Refresh</button>
       <button class="r s" onclick="clearLogs()">Clear</button>
     </div>
+    <div class="stat" style="margin:4px 0 8px">
+      <div><div class="k">Requests sent</div><div class="v" id="nsent">0</div></div>
+      <div><div class="k">Responses received</div><div class="v" id="nrecv">0</div></div>
+    </div>
+    <div id="banner"></div>
     <div class="mut" id="logmeta">Pick a session. It refreshes by itself every 3 seconds.</div>
     <div id="logs"></div>
   </div>
@@ -157,6 +185,38 @@ async function poll(n){
   }catch(e){}
 }
 
+
+// ---- Beijing clock + countdown ----
+let skew=0;
+const p2=n=>String(n).padStart(2,'0');
+function tick(){
+  const n=Date.now()+skew, d=new Date(n+8*3600000);
+  const h=d.getUTCHours(), m=d.getUTCMinutes(), sec=d.getUTCSeconds(), ms=d.getUTCMilliseconds();
+  $('bjtime').textContent=p2(h)+':'+p2(m)+':'+p2(sec)+'.'+String(ms).padStart(3,'0');
+  const next=Date.UTC(d.getUTCFullYear(),d.getUTCMonth(),d.getUTCDate()+1)-8*3600000;
+  let left=next-n; const lh=Math.floor(left/3600000); left%=3600000; const lm=Math.floor(left/60000); left%=60000;
+  $('cd').textContent=p2(lh)+':'+p2(lm)+':'+p2(Math.floor(left/1000))+'.'+p2(Math.floor(left%1000/10));
+  const open=h===0&&m<5;
+  $('pill').textContent=open?'WINDOW OPEN':'STANDBY'; $('pill').className='pill'+(open?' on':'');
+}
+async function syncClock(){
+  try{
+    const t0=Date.now(), r=await fetch('/?_='+t0,{method:'HEAD',cache:'no-store'}), t1=Date.now();
+    const sd=r.headers.get('date'); if(!sd) throw 0;
+    skew=new Date(sd).getTime()-(t0+t1)/2;
+    $('syncinfo').textContent='synced to server (about +/-1s)';
+  }catch(e){ $('syncinfo').textContent='sync failed, using device clock'; }
+}
+setInterval(tick,50); tick(); syncClock();
+
+function colorLine(l){
+  const e=esc(l);
+  if(/approved|permission granted/i.test(l)&&!/not approved/i.test(l)) return '<span class="l-ok">'+e+'</span>';
+  if(/error|failed|expired|invalid/i.test(l)) return '<span class="l-err">'+e+'</span>';
+  if(/limit|blocked|code=|locked/i.test(l)) return '<span class="l-warn">'+e+'</span>';
+  return e;
+}
+
 // ---- Live output per session ----
 async function fillSessions(){
   try{
@@ -177,9 +237,13 @@ async function loadLogs(){
     $('logs').innerHTML=ids.map(i=>{
       const t=j.tokens[i];
       return `<div class="lh"><span>${labels[i]||('Token '+i)}</span><span>${new Date(t.at).toLocaleTimeString()}</span></div>
-        <pre class="log" id="log-${i}">${esc(t.lines.join('\n'))}</pre>`;
+        <pre class="log" id="log-${i}">${t.lines.map(colorLine).join('\n')}</pre>`;
     }).join('');
     ids.forEach(i=>{const el=$('log-'+i); el.scrollTop=el.scrollHeight;});
+    $('nsent').textContent=ids.reduce((a,i)=>a+(j.tokens[i].sent||0),0);
+    $('nrecv').textContent=ids.reduce((a,i)=>a+(j.tokens[i].recv||0),0);
+    const won=ids.filter(i=>j.tokens[i].lines.some(l=>/\[Status\]: APPROVED|already approved/i.test(l)));
+    $('banner').innerHTML=won.length?'<div class="banner">Bootloader permission granted ('+won.map(i=>'Token '+i).join(', ')+')</div>':'';
     $('logmeta').textContent='Updated '+new Date().toLocaleTimeString();
   }catch(e){ $('logmeta').textContent=e.message }
 }
