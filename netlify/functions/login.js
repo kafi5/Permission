@@ -6,9 +6,9 @@
 // admin  GET  ?name=                    -> status for the website (no code returned)
 // admin  POST {name, code}              -> user submits the verification code
 // admin  POST {name, reset:true}        -> clear status
-const { loginStore, isAdmin, isRunner, safeName, json } = require("./_store");
+const { loginStore, isAdmin, isRunner, safeName, json, wrap } = require("./_store");
 
-exports.handler = async (event) => {
+exports.handler = wrap(async (event) => {
   const runner = isRunner(event);
   if (!runner && !isAdmin(event)) return json(401, { error: "unauthorized" });
   const s = loginStore();
@@ -42,4 +42,4 @@ exports.handler = async (event) => {
     return json(200, { ok: true });
   }
   return json(405, { error: "method" });
-};
+});

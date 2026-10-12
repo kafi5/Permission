@@ -1,6 +1,6 @@
-const { enc, store, isAdmin, safeName, json } = require("./_store");
+const { enc, store, isAdmin, safeName, json, wrap } = require("./_store");
 
-exports.handler = async (event) => {
+exports.handler = wrap(async (event) => {
   if (!isAdmin(event)) return json(401, { error: "wrong admin password" });
   const s = store();
 
@@ -43,4 +43,4 @@ exports.handler = async (event) => {
     return json(200, { ok: true });
   }
   return json(405, { error: "method" });
-};
+});

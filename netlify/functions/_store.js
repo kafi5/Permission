@@ -1,5 +1,6 @@
 const crypto = require("crypto");
-const { getStore } = require("@netlify/blobs");
+const blobs = require("@netlify/blobs");
+const { getStore } = blobs;
 
 const key = () => crypto.createHash("sha256").update(process.env.ENCRYPTION_KEY || "").digest();
 
@@ -28,3 +29,15 @@ exports.isAdmin = (e) => same(e.headers["x-admin-password"], process.env.ADMIN_P
 exports.isRunner = (e) => same(e.headers["x-runner-secret"], process.env.RUNNER_SECRET);
 exports.safeName = (n) => String(n || "").replace(/[^a-zA-Z0-9_-]/g, "").replace(/_{2,}/g, "_");
 exports.json = (code, obj) => ({ statusCode: code, headers: { "content-type": "application/json" }, body: JSON.stringify(obj) });
+
+// Every handler goes through this: connects Blobs (needed for this handler style)
+// and turns any crash into a readable JSON error instead of a blank 502.
+exports.wrap = (fn) => async (event) => {
+  try {
+    if (blobs.connectLambda) blobs.connectLambda(event);
+    return await fn(event);
+  } catch (e) {
+    console.error(e);
+    return exports.json(500, { error: "server error: " + (e && e.message ? e.message : String(e)) });
+  }
+};

@@ -1,9 +1,9 @@
-const { isAdmin, safeName, json } = require("./_store");
+const { isAdmin, safeName, json, wrap } = require("./_store");
 
 // body: {now:true}                 -> tonight's cycle, applying immediately (test)
 //       {}                         -> tonight's cycle now (waits for 9:55 PM)
 //       {mode:"login", name:"x"}   -> only connect that account (Gmail code / QR), no apply
-exports.handler = async (event) => {
+exports.handler = wrap(async (event) => {
   if (!isAdmin(event)) return json(401, { error: "wrong admin password" });
   const { now, mode, name } = JSON.parse(event.body || "{}");
   const inputs = { now: now ? "true" : "false", mode: mode === "login" ? "login" : "nightly", name: safeName(name) };
@@ -16,4 +16,4 @@ exports.handler = async (event) => {
     }
   );
   return json(r.ok ? 200 : 500, { ok: r.ok, status: r.status });
-};
+});

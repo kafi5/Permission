@@ -1,9 +1,9 @@
 // Called only by the GitHub Action (needs RUNNER_SECRET).
 // GET  -> accounts with decrypted credentials + saved browser tokens
 // POST -> save the tokens a login produced: {name, firefox, chrome}
-const { enc, dec, store, isRunner, safeName, json } = require("./_store");
+const { enc, dec, store, isRunner, safeName, json, wrap } = require("./_store");
 
-exports.handler = async (event) => {
+exports.handler = wrap(async (event) => {
   if (!isRunner(event)) return json(401, { error: "no" });
   const s = store();
 
@@ -31,4 +31,4 @@ exports.handler = async (event) => {
     });
   }
   return json(200, out);
-};
+});

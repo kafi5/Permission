@@ -3,11 +3,11 @@
 // admin  GET  ?name=<session>                     -> {tokens:{"1":{lines,at},...}}
 // admin  GET  (no name)                           -> {sessions:[{name,at}]}
 // admin  DELETE ?name=<session>                   -> clear that session's output
-const { logStore, isAdmin, isRunner, safeName, json } = require("./_store");
+const { logStore, isAdmin, isRunner, safeName, json, wrap } = require("./_store");
 
 const MAX_STORED = 300, MAX_SENT = 200, MAX_LINE = 300;
 
-exports.handler = async (event) => {
+exports.handler = wrap(async (event) => {
   const runner = isRunner(event);
   if (!runner && !isAdmin(event)) return json(401, { error: "unauthorized" });
   const s = logStore();
@@ -55,4 +55,4 @@ exports.handler = async (event) => {
     return json(200, { tokens });
   }
   return json(405, { error: "method" });
-};
+});
