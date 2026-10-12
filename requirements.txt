@@ -1,0 +1,6 @@
+ntplib
+pytz
+urllib3
+colorama
+playwright
+requests

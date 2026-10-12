@@ -1,233 +1,194 @@
 <!doctype html>
-<html lang="bn">
+<html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Mi Unlock Scheduler</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RHK Tech Premium Permission</title>
 <style>
-  :root {
-    --bg: #eef1f4; --panel: #ffffff; --ink: #1d2733; --muted: #667585;
-    --line: #d5dce3; --accent: #ff6900; --ok: #1f7a4d; --bad: #b3261e;
-    --term-bg: #16202a; --term-ink: #cfe3f1;
-  }
-  * { box-sizing: border-box; }
-  body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
-  header { display: flex; flex-wrap: wrap; gap: 12px 32px; align-items: baseline; justify-content: space-between; padding: 18px 24px; background: var(--panel); border-bottom: 1px solid var(--line); }
-  h1 { margin: 0; font-size: 19px; font-weight: 700; }
-  .clock { font-variant-numeric: tabular-nums; color: var(--muted); }
-  .clock b { color: var(--ink); font-size: 17px; }
-  main { max-width: 1100px; margin: 0 auto; padding: 20px 16px 60px; display: grid; gap: 20px; }
-  section { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 16px 18px; }
-  h2 { margin: 0 0 12px; font-size: 16px; }
-  .scroll { overflow-x: auto; }
-  table { border-collapse: collapse; width: 100%; min-width: 760px; }
-  th { text-align: left; font-weight: 600; font-size: 13px; color: var(--muted); padding: 4px 6px; }
-  td { padding: 4px 6px; vertical-align: top; }
-  input[type=text], input[type=password], input[type=number], textarea {
-    width: 100%; padding: 7px 9px; border: 1px solid var(--line); border-radius: 4px; font: inherit; background: #fff; color: var(--ink);
-  }
-  textarea { font-family: ui-monospace, Consolas, monospace; font-size: 12px; min-height: 110px; resize: vertical; }
-  input:focus-visible, textarea:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
-  td.tok input { font-family: ui-monospace, Consolas, monospace; font-size: 12px; }
-  button { font: inherit; padding: 7px 14px; border-radius: 4px; border: 1px solid var(--line); background: #f6f8fa; color: var(--ink); cursor: pointer; }
-  button:hover { background: #eaeef2; }
-  button.primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
-  button.primary:hover { background: #e55f00; }
-  .row-actions { display: flex; gap: 6px; flex-wrap: wrap; }
-  .bar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-top: 12px; }
-  .st { font-size: 12.5px; margin-top: 4px; max-width: 260px; }
-  .st.ok { color: var(--ok); } .st.bad { color: var(--bad); }
-  .note { color: var(--muted); font-size: 13px; margin: 0 0 10px; }
-  .login { max-width: 360px; margin: 14vh auto; }
-  .login p { margin: 0 0 12px; color: var(--muted); }
-  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-  @media (max-width: 640px) { .two { grid-template-columns: 1fr; } }
-  details summary { cursor: pointer; font-weight: 600; }
-  pre.term { margin: 0; background: var(--term-bg); color: var(--term-ink); padding: 12px 14px; border-radius: 4px; font: 12.5px/1.5 ui-monospace, Consolas, monospace; white-space: pre-wrap; word-break: break-all; max-height: 420px; overflow: auto; }
-  .logname { font-weight: 600; margin: 14px 0 6px; }
-  .toast { position: fixed; right: 16px; bottom: 16px; background: var(--ink); color: #fff; padding: 9px 14px; border-radius: 4px; opacity: 0; transition: opacity .2s; pointer-events: none; }
-  .toast.show { opacity: 1; }
-  @media (prefers-reduced-motion: reduce) { .toast { transition: none; } }
-  [hidden] { display: none !important; }
+  :root{--bg:#0b0d12;--card:#141824;--line:#232a3b;--tx:#e8ecf4;--mut:#8b94a8;--ac:#ff6a00;--ok:#3ecf8e}
+  *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.5 system-ui,sans-serif;padding:16px}
+  .wrap{max-width:560px;margin:auto}
+  h1{font-size:20px;margin:6px 0 2px}h1 span{color:var(--ac)}
+  .sub{color:var(--mut);font-size:13px;margin-bottom:16px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
+  h2{font-size:14px;margin:0 0 10px;color:var(--mut);text-transform:uppercase;letter-spacing:.06em}
+  input,select{width:100%;padding:11px 12px;margin-bottom:9px;background:#0e121b;border:1px solid var(--line);border-radius:10px;color:var(--tx);font-size:15px}
+  button{padding:11px 14px;border:0;border-radius:10px;background:var(--ac);color:#fff;font-weight:600;font-size:14px;cursor:pointer}
+  button.g{background:#232a3b}button.r{background:#3a1d1d;color:#ff8a8a}button.s{padding:8px 11px;font-size:13px}
+  .row{display:flex;gap:8px;flex-wrap:wrap}
+  .acc{padding:10px 0;border-top:1px solid var(--line)}.acc:first-of-type{border-top:0}
+  .acc .top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+  .mut{color:var(--mut);font-size:13px}.ok{color:var(--ok)}
+  .map{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;text-align:center;font-size:12px}
+  .map div{padding:10px 4px;border-radius:10px;border:1px solid var(--line)}
+  .ff{background:#2a1a0a;color:#ffa24d}.ch{background:#0f1f33;color:#6db3ff}
+  .panel{margin-top:10px;padding:12px;border:1px dashed var(--line);border-radius:10px;background:#0e121b}
+  .panel img{display:block;width:210px;max-width:100%;margin:8px auto;background:#fff;border-radius:8px;padding:6px}
+  .tag{font-size:11px;padding:2px 7px;border-radius:99px;background:#232a3b;color:var(--mut);margin-left:6px}
+  #msg{min-height:20px;font-size:13px;color:var(--mut)}
+  pre.log{margin:6px 0 0;padding:10px;background:#0a0d14;border:1px solid var(--line);border-radius:10px;font:12px/1.45 ui-monospace,Menlo,monospace;max-height:220px;overflow:auto;white-space:pre-wrap;word-break:break-all}
+  .lh{margin-top:12px;font-size:13px;color:var(--mut);display:flex;justify-content:space-between}
 </style>
 </head>
 <body>
+<div class="wrap">
+  <h1>RHK Tech <span>Premium Permission</span></h1>
+  <div class="sub">Login (Gmail code / QR) &rarr; 4 tokens &rarr; auto apply at 9:55 PM (BD)</div>
 
-<div id="login" class="login" hidden>
-  <section>
-    <h2>Login</h2>
-    <p>Netlify e set kora ADMIN_PASSWORD din.</p>
-    <input id="pw" type="password" placeholder="Password" autocomplete="current-password">
-    <div class="bar"><button class="primary" id="loginBtn">Login</button><span id="loginErr" class="st bad"></span></div>
-  </section>
+  <div class="card">
+    <h2>Admin</h2>
+    <input id="admin" type="password" placeholder="Admin password">
+  </div>
+
+  <div class="card">
+    <h2>Add account</h2>
+    <input id="name" placeholder="Session name (e.g. client1)">
+    <input id="user" placeholder="Mi ID / Email / Phone" autocomplete="off">
+    <select id="method" onchange="mchg()">
+      <option value="password">Password login (Gmail / SMS code if Xiaomi asks)</option>
+      <option value="qr">QR login (account owner scans, no password needed)</option>
+    </select>
+    <input id="pass" type="password" placeholder="Mi password" autocomplete="new-password">
+    <button onclick="add()">Save account</button>
+  </div>
+
+  <div class="card">
+    <h2>Token plan (per account)</h2>
+    <div class="map">
+      <div class="ff">Token 1<br>Firefox</div>
+      <div class="ch">Token 2<br>Chrome</div>
+      <div class="ff">Token 3<br>Firefox</div>
+      <div class="ch">Token 4<br>Chrome</div>
+    </div>
+    <p class="mut" style="margin:10px 0 0">Press <b>Connect</b> once per account: you will get a code box or a QR here. Firefox and Chrome are two separate logins, so you may be asked twice. After that the tokens are saved and the nightly run only asks again if they expire.</p>
+  </div>
+
+  <div class="card">
+    <h2>Accounts</h2>
+    <div id="list" class="mut">Enter admin password, then Refresh.</div>
+    <div class="row" style="margin-top:10px">
+      <button class="g" onclick="load()">Refresh</button>
+      <button onclick="run(false)">Run tonight's cycle now</button>
+      <button class="g" onclick="run(true)">Apply immediately</button>
+    </div>
+  </div>
+  <div class="card">
+    <h2>Live output</h2>
+    <div class="row" style="margin-bottom:8px">
+      <select id="logsess" style="flex:1;margin:0" onchange="loadLogs()"></select>
+      <button class="g s" onclick="loadLogs()">Refresh</button>
+      <button class="r s" onclick="clearLogs()">Clear</button>
+    </div>
+    <div class="mut" id="logmeta">Pick a session. It refreshes by itself every 3 seconds.</div>
+    <div id="logs"></div>
+  </div>
+  <div id="msg"></div>
 </div>
-
-<div id="app" hidden>
-  <header>
-    <h1>Mi Unlock Scheduler</h1>
-    <div class="clock">Beijing time: <b id="bjNow">--</b> &nbsp; Porer midnight-e baki: <b id="left">--</b></div>
-    <button id="logout">Logout</button>
-  </header>
-
-  <main>
-    <section>
-      <h2>Accounts (token.txt + timeshift.txt)</h2>
-      <p class="note">Prottek row = ekta account. Offset milliseconds-e, midnight er koto ms age request jabe. Server prottidin Beijing time 23:55 e chalu hoy, ar 00:00 porjonto wait kore request pathay.</p>
-      <div class="scroll">
-        <table>
-          <thead><tr><th>Name</th><th>Token</th><th>Offset (ms)</th><th>On</th><th title="Locked ba 30 din na hole-o try korbe">Force</th><th></th></tr></thead>
-          <tbody id="rows"></tbody>
-        </table>
-      </div>
-      <div class="bar">
-        <button id="add">Account jog koro</button>
-        <button class="primary" id="save">Save</button>
-        <span id="saveMsg" class="st"></span>
-      </div>
-    </section>
-
-    <section>
-      <details>
-        <summary>token.txt / timeshift.txt format-e import ba export</summary>
-        <p class="note" style="margin-top:10px">Ek line = ek account. Token line ar offset line same serial-e hote hobe. Import korle upore thaka list replace hoy (save na korle server-e jay na).</p>
-        <div class="two">
-          <div><label for="bulkTok">token.txt</label><textarea id="bulkTok" spellcheck="false"></textarea></div>
-          <div><label for="bulkOff">timeshift.txt</label><textarea id="bulkOff" spellcheck="false"></textarea></div>
-        </div>
-        <div class="bar"><button id="doImport">Import</button><button id="doExport">Ekhon-er list export</button></div>
-      </details>
-    </section>
-
-    <section>
-      <h2>Last run log</h2>
-      <div class="bar" style="margin:0 0 6px">
-        <button id="refreshLogs">Refresh</button>
-        <label><input type="checkbox" id="auto"> Auto refresh (5s)</label>
-      </div>
-      <div id="logs"><pre class="term">Ekhono kono run hoyni.</pre></div>
-    </section>
-  </main>
-</div>
-
-<div id="toast" class="toast" role="status"></div>
-
 <script>
-const $ = (s) => document.querySelector(s);
-let pw = sessionStorage.getItem("pw") || "";
-let accounts = [];
-let autoTimer = null;
+const $=id=>document.getElementById(id);
+const hdr=()=>({'content-type':'application/json','x-admin-password':$('admin').value});
+const say=t=>$('msg').textContent=t;
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let polling=null, watching=null;
 
-const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-function toast(msg) { const t = $("#toast"); t.textContent = msg; t.classList.add("show"); setTimeout(() => t.classList.remove("show"), 2200); }
+async function api(path,method,body){
+  const r=await fetch('/.netlify/functions/'+path,{method,headers:hdr(),body:body&&JSON.stringify(body)});
+  const j=await r.json().catch(()=>({}));
+  if(!r.ok) throw new Error(j.error||('error '+r.status));
+  return j;
+}
+function mchg(){ $('pass').style.display=$('method').value==='qr'?'none':'block'; }
 
-async function api(path, opts = {}) {
-  const r = await fetch("/api/" + path, { ...opts, headers: { "content-type": "application/json", "x-admin-password": pw } });
-  if (r.status === 401) { showLogin("Password thik na."); throw new Error("unauthorized"); }
-  return r.json();
+async function load(){
+  try{
+    const a=await api('accounts','GET');
+    $('list').innerHTML=a.length?a.map(x=>`
+      <div class="acc"><div class="top">
+        <div>${esc(x.name)}<span class="tag">${x.method==='qr'?'QR':'password'}</span>
+          <div class="mut">${esc(x.userMasked)} &middot; ${x.tokensSavedAt?'<span class="ok">connected</span> '+new Date(x.tokensSavedAt).toLocaleString():'not connected yet'}</div></div>
+        <div class="row"><button class="s" onclick="connect('${esc(x.name)}')">Connect</button>
+        <button class="s r" onclick="del('${esc(x.name)}')">Remove</button></div></div>
+        <div id="p-${esc(x.name)}"></div></div>`).join(''):'No accounts yet.';
+    say('');fillSessions();
+  }catch(e){say(e.message)}
+}
+async function add(){
+  try{
+    await api('accounts','POST',{name:$('name').value,user:$('user').value,password:$('pass').value,method:$('method').value});
+    $('user').value=$('pass').value='';say('Saved (encrypted).');load();
+  }catch(e){say(e.message)}
+}
+async function del(n){ if(confirm('Remove '+n+'?')){await api('accounts','DELETE',{name:n});load();} }
+async function run(now){
+  try{await api('run','POST',{now});say(now?'Started - applying immediately.':'Started - will login now and apply at 9:55 PM.')}
+  catch(e){say(e.message)}
 }
 
-function showLogin(err = "") {
-  sessionStorage.removeItem("pw"); pw = "";
-  $("#app").hidden = true; $("#login").hidden = false; $("#loginErr").textContent = err;
+// ---- Connect: start a login-only run and show what it needs from the user ----
+async function connect(n){
+  try{
+    await api('login','POST',{name:n,reset:true});
+    await api('run','POST',{mode:'login',name:n});
+    watching=n;
+    panel(n,'<div class="mut">Starting the login on GitHub... this takes about a minute.</div>');
+    clearInterval(polling); polling=setInterval(()=>poll(n),3000);
+  }catch(e){say(e.message)}
 }
-
-async function enter() {
-  try { accounts = await api("accounts"); } catch { return; }
-  $("#login").hidden = true; $("#app").hidden = false;
-  render(); loadLogs();
+function panel(n,html){ const el=$('p-'+n); if(el) el.innerHTML=html?'<div class="panel">'+html+'</div>':''; }
+async function sendCode(n){
+  const v=$('code-'+n).value.trim(); if(!v) return;
+  try{ await api('login','POST',{name:n,code:v}); panel(n,'<div class="mut">Code sent, entering it...</div>'); }catch(e){say(e.message)}
 }
-
-$("#loginBtn").onclick = () => { pw = $("#pw").value; sessionStorage.setItem("pw", pw); enter(); };
-$("#pw").addEventListener("keydown", (e) => { if (e.key === "Enter") $("#loginBtn").click(); });
-$("#logout").onclick = () => showLogin();
-
-function render() {
-  $("#rows").innerHTML = accounts.map((a, i) => `
-    <tr data-i="${i}">
-      <td><input type="text" data-f="label" value="${esc(a.label)}" placeholder="Account ${i + 1}"></td>
-      <td class="tok"><input type="text" data-f="token" value="${esc(a.token)}" spellcheck="false" autocomplete="off"></td>
-      <td><input type="number" data-f="offset" value="${esc(a.offset)}" style="width:90px"></td>
-      <td><input type="checkbox" data-f="enabled" ${a.enabled !== false ? "checked" : ""}></td>
-      <td><input type="checkbox" data-f="force" ${a.force ? "checked" : ""}></td>
-      <td>
-        <div class="row-actions"><button data-act="status">Status check</button><button data-act="del" aria-label="Delete">Delete</button></div>
-        <div class="st"></div>
-      </td>
-    </tr>`).join("") || `<tr><td colspan="6" class="note">Kono account nei. "Account jog koro" chapo ba import koro.</td></tr>`;
-}
-
-$("#rows").addEventListener("input", (e) => {
-  const tr = e.target.closest("tr"); if (!tr || !e.target.dataset.f) return;
-  const a = accounts[+tr.dataset.i], f = e.target.dataset.f;
-  a[f] = e.target.type === "checkbox" ? e.target.checked : f === "offset" ? Number(e.target.value) : e.target.value;
-});
-
-$("#rows").addEventListener("click", async (e) => {
-  const act = e.target.dataset.act; if (!act) return;
-  const tr = e.target.closest("tr"), i = +tr.dataset.i, st = tr.querySelector(".st");
-  if (act === "del") { accounts.splice(i, 1); render(); return; }
-  st.className = "st"; st.textContent = "Checking...";
-  try {
-    const r = await api("status", { method: "POST", body: JSON.stringify({ token: accounts[i].token }) });
-    st.textContent = r.line || r.error || "Unknown";
-    st.className = "st " + (r.proceed ? "ok" : "bad");
-  } catch { st.textContent = "Error"; st.className = "st bad"; }
-});
-
-$("#add").onclick = () => { accounts.push({ label: "", token: "", offset: 0, enabled: true, force: false }); render(); };
-
-$("#save").onclick = async () => {
-  const m = $("#saveMsg"); m.className = "st"; m.textContent = "Saving...";
-  try {
-    const r = await api("accounts", { method: "PUT", body: JSON.stringify(accounts) });
-    accounts = r.accounts; render();
-    m.className = "st ok"; m.textContent = `${r.saved} ta account save hoyeche.`; toast("Saved");
-  } catch { m.className = "st bad"; m.textContent = "Save hoyni."; }
-};
-
-$("#doImport").onclick = () => {
-  const toks = $("#bulkTok").value.split(/\r?\n/).map((s) => s.trim());
-  const offs = $("#bulkOff").value.split(/\r?\n/).map((s) => s.trim());
-  const seen = new Set(), out = [];
-  toks.forEach((t, i) => {
-    if (!t || seen.has(t)) return; seen.add(t);
-    out.push({ label: `Account ${out.length + 1}`, token: t, offset: Number(offs[i]) || 0, enabled: true, force: false });
-  });
-  accounts = out; render(); toast(`${out.length} ta import hoyeche, Save chapo`);
-};
-$("#doExport").onclick = () => {
-  $("#bulkTok").value = accounts.map((a) => a.token).join("\n");
-  $("#bulkOff").value = accounts.map((a) => a.offset).join("\n");
-};
-
-async function loadLogs() {
-  try {
-    const logs = await api("logs");
-    const box = $("#logs"); box.innerHTML = "";
-    if (!logs.length) { box.innerHTML = '<pre class="term">Ekhono kono run hoyni.</pre>'; return; }
-    logs.sort((a, b) => (a.label || "").localeCompare(b.label || ""));
-    for (const l of logs) {
-      const h = document.createElement("div"); h.className = "logname";
-      h.textContent = `${l.label || l.id}  (updated ${new Date(l.updated).toLocaleString()})`;
-      const p = document.createElement("pre"); p.className = "term"; p.textContent = l.lines.join("\n");
-      box.append(h, p);
+async function poll(n){
+  try{
+    const r=await fetch('/.netlify/functions/login?name='+encodeURIComponent(n),{headers:hdr()});
+    const s=await r.json();
+    if(s.state==='need_code'&&!s.codeSent){
+      if(!$('code-'+n)) panel(n,`<div>${esc(s.msg)}</div><input id="code-${esc(n)}" inputmode="numeric" placeholder="Verification code" style="margin-top:8px"><button onclick="sendCode('${esc(n)}')">Submit code</button>`);
+    }else if(s.state==='qr'){
+      panel(n,`<div>${esc(s.msg)}</div>${s.qr?`<img src="${s.qr}" alt="QR">`:''}<div class="mut">The QR refreshes by itself; if it expires, wait for the new one.</div>`);
+    }else if(s.state==='verifying'||s.state==='starting'){
+      panel(n,`<div class="mut">${esc(s.msg||'Working...')}</div>`);
+    }else if(s.state==='ok'){
+      panel(n,`<div class="ok">${esc(s.msg)}</div>`); clearInterval(polling); load();
+    }else if(s.state==='failed'){
+      panel(n,`<div style="color:#ff8a8a">Failed: ${esc(s.msg)}</div>`); clearInterval(polling);
     }
-  } catch {}
+  }catch(e){}
 }
-$("#refreshLogs").onclick = loadLogs;
-$("#auto").onchange = (e) => { clearInterval(autoTimer); if (e.target.checked) autoTimer = setInterval(loadLogs, 5000); };
 
-function tick() {
-  const now = Date.now(), d = new Date(now);
-  $("#bjNow").textContent = new Date(now + 8 * 3600e3).toISOString().slice(11, 19);
-  let mid = Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate(), 16, 0, 0);
-  if (now >= mid) mid += 86400e3;
-  const s = Math.floor((mid - now) / 1000);
-  $("#left").textContent = [Math.floor(s / 3600), Math.floor(s / 60) % 60, s % 60].map((n) => String(n).padStart(2, "0")).join(":");
+// ---- Live output per session ----
+async function fillSessions(){
+  try{
+    const a=await api('accounts','GET'), sel=$('logsess'), cur=sel.value;
+    sel.innerHTML=a.map(x=>`<option value="${esc(x.name)}">${esc(x.name)}</option>`).join('');
+    if(cur) sel.value=cur;
+    loadLogs();
+  }catch(e){}
 }
-setInterval(tick, 1000); tick();
-
-if (pw) enter(); else showLogin();
+async function loadLogs(){
+  const n=$('logsess').value; if(!n){return}
+  try{
+    const r=await fetch('/.netlify/functions/logs?name='+encodeURIComponent(n),{headers:hdr()});
+    const j=await r.json(); if(!r.ok) throw new Error(j.error||r.status);
+    const ids=Object.keys(j.tokens).sort();
+    if(!ids.length){ $('logs').innerHTML='<div class="mut" style="margin-top:8px">No output yet for this session.</div>'; return; }
+    const labels={1:'Token 1 - Firefox',2:'Token 2 - Chrome',3:'Token 3 - Firefox',4:'Token 4 - Chrome'};
+    $('logs').innerHTML=ids.map(i=>{
+      const t=j.tokens[i];
+      return `<div class="lh"><span>${labels[i]||('Token '+i)}</span><span>${new Date(t.at).toLocaleTimeString()}</span></div>
+        <pre class="log" id="log-${i}">${esc(t.lines.join('\n'))}</pre>`;
+    }).join('');
+    ids.forEach(i=>{const el=$('log-'+i); el.scrollTop=el.scrollHeight;});
+    $('logmeta').textContent='Updated '+new Date().toLocaleTimeString();
+  }catch(e){ $('logmeta').textContent=e.message }
+}
+async function clearLogs(){
+  const n=$('logsess').value; if(!n||!confirm('Clear output of '+n+'?')) return;
+  await fetch('/.netlify/functions/logs?name='+encodeURIComponent(n),{method:'DELETE',headers:hdr()}); loadLogs();
+}
+setInterval(()=>{ if($('logsess').value && document.visibilityState==='visible') loadLogs(); },3000);
+mchg();
 </script>
 </body>
 </html>
